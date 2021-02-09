@@ -49,7 +49,6 @@ fn main() {
     // which is multi-threaded
     let rt = Runtime::new().expect("Couldn't create runtime");
 
-    // This is the equivalent of `#[actix::main] fn main() {}`
     rt.block_on(async {
         let mut w = Printer { count: 0 }.start("com.example.printer".into());
 

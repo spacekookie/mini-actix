@@ -15,9 +15,8 @@ pub enum WorkerState {
 //   - `Receiver` from actix::System
 //   - Generator function for Sender<A>
 //
-// Being able to generate a sender to the worker from the context
-// means that actix can take let other actors send messages to any
-// actor.
+// Something I didn't find in the code: how do you get the address
+// handle to an arbitrary Actor in actix?
 pub trait WorkerContext: Sized {
     fn state(&self) -> WorkerState;
 }
@@ -72,6 +71,19 @@ impl<W: Worker<Context = Context<W>>> Mailbox<W> {
         // comment in worker.rs for a clarification on that problem!
         if let Some(_) = self.msgs.recv().await {
             let env: Envelope<W> = todo!();
+
+            // What actix does here that I don't
+            //
+            // The mailbox needs to have mutable access to the Worker
+            // and the Context.  Both should be available in
+            // Context::run(), but it does require some mutability
+            // shuffling that I didn't spend time on: the Context is
+            // wrapped by a ContextFut which implements `Future` and
+            // can then mutably borrow the three fields from itself
+            // that it needs, instead of having to `&mut self` as
+            // would be required in this example.
+            
+            // env.handle(worker, ctx)
         }
     }
 }
